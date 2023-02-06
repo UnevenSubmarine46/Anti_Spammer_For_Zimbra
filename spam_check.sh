@@ -6,7 +6,7 @@
 #Получаем очередь по пользователям на данный момент
 
 
-postqueue -p | grep @resanta.ru | awk '{ print $7}' | sort | uniq -c  | sort -r -k1 | grep resanta  > spammers.txt
+postqueue -p | grep "Домен почтового ящика" | awk '{ print $7}' | sort | uniq -c  | sort -r -k1 | grep resanta  > spammers.txt
 
 #Проверяем 5 первых по  количеству писем учеток
 
@@ -26,9 +26,6 @@ while read i;
 
 #Получаем id сообщений в очереди  и записываем в временный файл
 idlist=`/opt/zimbra/common/sbin/postqueue -p | grep "$name" |cut -d " " -f1 | cut -d "*" -f1` #Поменять после теста
-
-curl POST https://api.telegram.org/bot5950614981:AAF1qjG_Matt5W_sGAuJpxHrnR3GFW6N8oc/sendMessage -d chat_id=-846339891 -d \text="$(printf "Почтовый ящик: %s\nКоличество писем в очереди: %s\nЛимит превышен, пользователь заблокирован %s" "$name" "$mails" " ")"
-
 #Проходимся циклом и удаляем сообщения из очереди
 for a in $idlist
 
@@ -39,12 +36,7 @@ for a in $idlist
 
 	else
 		echo " $name  Not a spammer" >> /dev/null  
-		#curl POST https://api.telegram.org/bot5950614981:AAF1qjG_Matt5W_sGAuJpxHrnR3GFW6N8oc/sendMessage -d chat_id=-846339891 -d \text="$(printf "Спамеров нет!!!: %s\nКоличество писем в очереди: %s\n%s" "" "" " ")"
-
+		
 	fi	
 	
 	done < spammers.txt
-	#curl POST https://api.telegram.org/bot5950614981:AAF1qjG_Matt5W_sGAuJpxHrnR3GFW6N8oc/sendMessage -d chat_id=-846339891 -d \text="$(printf "Тест Крона: %s\nКоличество писем в очереди: %s\n%s" "" "" " ")"
-	
-	#done < spammers.txt
-
